@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#E63946">
+  <title>Miss Biss Pizzeria | Sarezzo — Pizza delivery a domicilio e ovunque tu sia</title>
+  <meta name="description" content="Miss Biss Pizzeria a Sarezzo (Lombardia) dal 1971. Pizza artigianale, consegna a domicilio e ovunque tu sia. Ordina online via WhatsApp. Pizzeria near me, pizza delivery Sarezzo.">
+  <meta name="keywords" content="pizzeria Sarezzo, pizza delivery Sarezzo, pizza a domicilio Sarezzo, Miss Biss, pizza da asporto Sarezzo, pizzeria near me">
+  <meta name="author" content="Miss Biss Pizzeria">
+  
+  <!-- Open Graph / Meta -->
+  <meta property="og:type" content="restaurant">
+  <meta property="og:title" content="Miss Biss Pizzeria | Sarezzo">
+  <meta property="og:description" content="Pizza artigianale dal 1971. Consegniamo a domicilio o ovunque tu sia. Ordina online.">
+  <meta property="og:image" content="assets/images/pizza-salame.jpg">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:locale:alternate" content="en_US">
+  
+  <link rel="icon" type="image/jpeg" href="assets/images/logo.jpg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=Architects+Daughter&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS for Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <!-- Original App CSS (Tailwind + Design tokens + Leaflet) -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="relative min-h-screen font-body antialiased bg-background text-foreground transition-colors duration-300">
+
+  <!-- Fixed Background Wallpaper Layer -->
+  <div class="fixed inset-0 -z-10 pointer-events-none" aria-hidden="true">
+    <div class="absolute inset-0 bg-cover bg-center bg-fixed" style="background-image: url('assets/images/bg-hero.png');"></div>
+    <div class="absolute inset-0 bg-background/70 backdrop-blur-[2px]"></div>
+  </div>
+
+  <!-- Header -->
+  <header id="mainHeader" class="fixed top-0 inset-x-0 z-[1000] transition-all duration-300 bg-transparent">
+    <div class="container-x flex items-center justify-between h-16 sm:h-20 section-pad">
+      <!-- Brand Logo -->
+      <a href="#home" class="flex items-center gap-2.5 shrink-0" id="brandLogo">
+        <img src="assets/images/logo.jpg" alt="Miss Biss logo" class="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover ring-2 ring-primary/30">
+        <div class="leading-tight text-left">
+          <span class="block font-display text-lg sm:text-xl font-bold text-primary">Miss Biss</span>
+          <span class="block text-[10px] sm:text-xs uppercase tracking-widest text-muted-foreground">Pizzeria</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-1" aria-label="Main Navigation">
+        <a href="#home" class="px-3 py-2 text-sm font-medium rounded-full text-foreground/80 hover:text-primary hover:bg-primary/5 transition-colors" data-i18n="nav.home">Home</a>
+        <a href="#menu" class="px-3 py-2 text-sm font-medium rounded-full text-foreground/80 hover:text-primary hover:bg-primary/5 transition-colors" data-i18n="nav.menu">Menu</a>
+        <a href="#delivery" class="px-3 py-2 text-sm font-medium rounded-full text-foreground/80 hover:text-primary hover:bg-primary/5 transition-colors" data-i18n="nav.delivery">Delivery</a>
+        <a href="#about" class="px-3 py-2 text-sm font-medium rounded-full text-foreground/80 hover:text-primary hover:bg-primary/5 transition-colors" data-i18n="nav.about">Chi siamo</a>
+        <a href="#contact" class="px-3 py-2 text-sm font-medium rounded-full text-foreground/80 hover:text-primary hover:bg-primary/5 transition-colors" data-i18n="nav.contact">Contatti</a>
+      </nav>
+
+      <!-- Header Actions -->
+      <div class="flex items-center gap-2">
+        <div class="hidden sm:flex items-center gap-2">
+          <!-- Lang Switcher -->
+          <div class="inline-flex items-center gap-0.5 rounded-full border border-border glass p-0.5 text-sm">
+            <button type="button" class="px-2.5 py-1 rounded-full font-semibold transition-colors bg-primary text-primary-foreground" id="btnLangIt">IT</button>
+            <button type="button" class="px-2.5 py-1 rounded-full font-semibold transition-colors text-muted-foreground hover:text-foreground" id="btnLangEn">EN</button>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border glass text-foreground transition-transform active:scale-90" id="btnThemeToggle" aria-label="Toggle theme">
+            <svg id="themeIconSun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            <svg id="themeIconMoon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+        </div>
+
+        <!-- Cart Button -->
+        <button type="button" class="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-border glass text-foreground" id="btnOpenCart" aria-label="Cart">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold hidden items-center justify-center" id="cartBadgeCount">0</span>
+        </button>
+
+        <!-- Order CTA Button -->
+        <a href="#order" class="hidden sm:inline-flex items-center px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity" data-i18n="nav.order">Ordina ora</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Section Hero -->
+    <section id="home" class="relative min-h-[100svh] flex items-end overflow-hidden">
+      <div class="absolute inset-0">
+        <img src="assets/images/bg-hero.png" alt="Miss Biss Pizzeria" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/25"></div>
+      </div>
+      <div class="relative z-10 w-full container-x section-pad pb-28 sm:pb-24 pt-28">
+        <div class="max-w-2xl">
+          <!--
+          <span class="inline-flex items-center gap-2 rounded-full glass text-white px-4 py-1.5 text-xs sm:text-sm font-semibold uppercase tracking-wider">
+            <span class="h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+            <span data-i18n="hero.badge">Pizzeria dal 1971 · Sarezzo</span>
+          </span>
+          <h1 class="mt-4 font-display text-6xl sm:text-7xl lg:text-8xl font-bold text-white drop-shadow-lg leading-none" data-i18n="hero.title">Miss Biss</h1>
+          <p class="mt-4 text-lg sm:text-xl text-white/90 max-w-xl leading-relaxed" style="font-family:'Architects Daughter', system-ui;" data-i18n="hero.subtitle">L'autentica pizza cotta nel forno a legna. Consegniamo a domicilio o ovunque tu sia.</p>
+          -->
+          
+          <div class="mt-7 flex flex-wrap gap-3">
+            <a href="#order" class="inline-flex items-center justify-center min-h-[56px] px-7 rounded-full bg-primary text-primary-foreground font-semibold text-base shadow-lg animate-pulse-glow hover:scale-[1.02] transition-transform" data-i18n="hero.orderNow">Ordina ora</a>
+            <a href="#menu" class="inline-flex items-center justify-center min-h-[56px] px-7 rounded-full glass text-black hover:text-white dark:text-white border border-white/30 font-semibold text-base hover:bg-white/10 transition-colors" data-i18n="hero.exploreMenu">Scopri il menu</a>
+          </div>
+
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href="tel:+39030803081" class="inline-flex items-center gap-2 min-h-[52px] px-5 rounded-full glass text-black hover:text-white dark:text-white border border-white/25 font-medium hover:bg-white/10 transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span data-i18n="hero.call">Chiama</span>
+            </a>
+            <a href="https://wa.me/393248184746?text=Ciao%2C%20vorrei%20ordinare%20una%20pizza." target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 min-h-[52px] px-5 rounded-full bg-[#25D366] text-white font-medium hover:opacity-90 transition-opacity" id="heroWhatsAppBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+              <span>WhatsApp</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- DELIVERY Scroll Indicator Button (Bottom center) -->
+      <button type="button" onclick="document.getElementById('delivery')?.scrollIntoView({behavior:'smooth'})" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-white/70 hover:text-white text-xs uppercase tracking-widest hidden sm:flex flex-col items-center gap-1 transition-colors cursor-pointer" aria-label="Scroll to delivery section">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Delivery</span>
+        <span class="text-[10px] animate-bounce">↓</span>
+      </button>
+    </section>
+
+    <!-- Section Delivery -->
+    <section id="delivery" class="section-pad py-16 sm:py-24 bg-background/30">
+      <div class="container-x">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <span class="text-sm font-semibold uppercase tracking-widest text-secondary" data-i18n="delivery.badge">🚚 Delivery ovunque</span>
+          <h2 class="mt-2 font-display text-4xl sm:text-5xl font-bold" data-i18n="delivery.title">Consegniamo dove ti trovi</h2>
+          <p class="mt-3 text-lg font-medium text-foreground" data-i18n="delivery.headline">Consegniamo a domicilio o ovunque tu sia.</p>
+          <p class="mt-2 text-muted-foreground" data-i18n="delivery.sub">Casa, ufficio, hotel, posto di lavoro, casa di amici: portiamo la pizza dove sei tu.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+          <!-- Interactive Delivery Location Map -->
+          <div class="rounded-3xl bg-card border border-border p-3 sm:p-4 shadow-sm">
+            <div class="relative h-[320px] sm:h-[420px] rounded-2xl overflow-hidden z-0 isolate">
+              <div id="deliveryMap" class="w-full h-full"></div>
+            </div>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button type="button" class="inline-flex items-center gap-2 min-h-[48px] px-5 rounded-full bg-secondary text-secondary-foreground font-semibold text-sm hover:opacity-90 transition-opacity" id="btnUseLocation">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                <span data-i18n="delivery.useLocation">Usa la mia posizione</span>
+              </button>
+              <button type="button" class="inline-flex items-center gap-2 min-h-[48px] px-5 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity" id="btnConfirmLocation">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <span data-i18n="delivery.confirm">Conferma posizione</span>
+              </button>
+            </div>
+            <p id="deliveryStatusMsg" class="mt-2 text-sm text-secondary font-semibold hidden items-center gap-1"></p>
+          </div>
+
+          <!-- Address Search & Notes -->
+          <div class="rounded-3xl bg-card border border-border p-5 sm:p-6 shadow-sm flex flex-col gap-4">
+            <div>
+              <label for="addressInput" class="text-sm font-semibold mb-1.5 block" data-i18n="delivery.searchAddress">Cerca indirizzo</label>
+              <div class="flex gap-2">
+                <input type="text" id="addressInput" class="flex-1 min-h-[48px] rounded-xl border border-input bg-background px-4 text-base outline-none focus:ring-2 ring-primary" placeholder="Inserisci il tuo indirizzo" data-i18n-ph="delivery.addressPlaceholder">
+                <button type="button" class="inline-flex items-center gap-2 min-h-[48px] px-4 rounded-xl bg-foreground text-background font-semibold text-sm" id="btnSearchAddress" aria-label="Search">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label for="deliveryNotesInput" class="text-sm font-semibold mb-1.5 block" data-i18n="delivery.notes">Note di consegna</label>
+              <textarea id="deliveryNotesInput" rows="3" class="w-full rounded-xl border border-input bg-background p-3 text-base outline-none focus:ring-2 ring-primary resize-none" placeholder="Es. interno, piano, citofono, stanza hotel..." data-i18n-ph="delivery.notesPlaceholder"></textarea>
+            </div>
+
+            <div class="rounded-2xl bg-muted/60 p-4">
+              <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3" data-i18n="delivery.examplesTitle">Consegniamo presso:</p>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="deliveryExamplesGrid">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Menu -->
+    <section id="menu" class="section-pad py-16 sm:py-24">
+      <div class="container-x">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <span class="text-sm font-semibold uppercase tracking-widest text-primary" data-i18n="menu.title">Il nostro Menu</span>
+          <h2 class="mt-2 font-display text-4xl sm:text-5xl font-bold" data-i18n="menu.title">Il nostro Menu</h2>
+          <p class="mt-3 text-muted-foreground" data-i18n="menu.subtitle">Pizza artigianale cotta nel forno a legna</p>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="flex justify-center gap-2 mb-10 overflow-x-auto no-scrollbar" id="categoryTabs">
+          <!-- Injected via JavaScript -->
+        </div>
+
+        <!-- Pizza Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6" id="pizzaGrid">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Section About / Storia -->
+    <section id="about" class="section-pad py-16 sm:py-24">
+      <div class="container-x grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <!-- Photo with Wood-fired Badge -->
+        <div class="relative">
+          <div class="rounded-3xl overflow-hidden border border-border shadow-lg aspect-[4/3]">
+            <img src="assets/images/patio.png" alt="Miss Biss pizzeria" class="w-full h-full object-cover">
+          </div>
+          <div class="hidden sm:block absolute -bottom-5 -right-5 rounded-2xl glass border border-border p-4 shadow-xl">
+            <div class="flex items-center gap-2 text-primary">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+              <span class="font-display text-xl font-bold">Forno a legna</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Story Text & Stats -->
+        <div>
+          <span class="text-sm font-semibold uppercase tracking-widest text-primary" data-i18n="about.title">La nostra storia</span>
+          <h2 class="mt-2 font-display text-4xl sm:text-5xl font-bold" data-i18n="about.title">La nostra storia</h2>
+          <div class="mt-5 space-y-4 text-base text-foreground/80 leading-relaxed">
+            <p data-i18n="about.p1">Miss Biss è una pizzeria di Sarezzo, in Lombardia, che dal 1971 porta in tavola l'autentica traditione della pizza italiana. Forno a legna, ingredienti freschi e pasta lavorata a mano ogni giorno.</p>
+            <p data-i18n="about.p2">Un luogo caloroso, familiare e accogliente, dove la qualità della pizza incontra la passione per il mestiere. Che tu venga a trovarci o che ti consegnamo a casa, l'esperienza Miss Biss è sempre la stessa: gusto, semplicità e tradizione.</p>
+          </div>
+
+          <div class="mt-8 grid grid-cols-3 gap-3">
+            <div class="rounded-2xl bg-card border border-border p-4 text-center">
+              <p class="font-display text-xl sm:text-2xl font-bold text-primary" data-i18n="about.stat1">Dal 1971</p>
+              <p class="text-xs text-muted-foreground mt-1" data-i18n="about.stat1Label">Tradizione</p>
+            </div>
+            <div class="rounded-2xl bg-card border border-border p-4 text-center">
+              <p class="font-display text-xl sm:text-2xl font-bold text-primary" data-i18n="about.stat2">Forno a legna</p>
+              <p class="text-xs text-muted-foreground mt-1" data-i18n="about.stat2Label">Cottura</p>
+            </div>
+            <div class="rounded-2xl bg-card border border-border p-4 text-center">
+              <p class="font-display text-xl sm:text-2xl font-bold text-primary" data-i18n="about.stat3">Ovunque</p>
+              <p class="text-xs text-muted-foreground mt-1" data-i18n="about.stat3Label">Consegna</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Order / Checkout -->
+    <section id="order" class="section-pad py-16 sm:py-24 bg-background/30">
+      <div class="container-x">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <span class="text-sm font-semibold uppercase tracking-widest text-primary" data-i18n="nav.order">Ordina ora</span>
+          <h2 class="mt-2 font-display text-4xl sm:text-5xl font-bold" data-i18n="checkout.title">Completa l'ordine</h2>
+          <p class="mt-3 text-secondary font-semibold" data-i18n="checkout.anywhere">Consegniamo dove ti trovi.</p>
+        </div>
+
+        <!-- Success Confirmation State (Hidden by default) -->
+        <div id="orderSuccessState" class="max-w-md mx-auto rounded-3xl bg-card border border-border p-8 text-center shadow-sm" style="display:none;">
+          <div class="mx-auto h-16 w-16 rounded-full bg-[#25D366] text-white flex items-center justify-center mb-4">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <h3 class="font-display text-2xl font-bold" id="orderSuccessTitle">Ordine inviato!</h3>
+          <p class="mt-2 text-muted-foreground" id="orderSuccessMsg">Ti contatteremo su WhatsApp per confermare. Grazie!</p>
+          <button type="button" class="mt-6 inline-flex items-center gap-2 min-h-[52px] px-6 rounded-full bg-foreground text-background font-semibold text-base hover:opacity-90 transition-opacity" id="btnResetOrder">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            <span id="btnResetOrderText">Nuovo ordine</span>
+          </button>
+        </div>
+
+        <!-- Active Order Checkout Flow -->
+        <div id="orderActiveState" class="grid lg:grid-cols-5 gap-6">
+          <!-- Left Column: Cart Review (lg:col-span-2) -->
+          <div class="lg:col-span-2 rounded-3xl bg-card border border-border p-5 shadow-sm flex flex-col justify-between">
+            <div>
+              <h3 class="font-display text-xl font-bold mb-4 flex items-center gap-2">
+                <svg width="20" height="20" class="text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                <span data-i18n="checkout.review">Rivedi l'ordine</span>
+              </h3>
+              
+              <p id="checkoutCartEmpty" class="text-muted-foreground py-8 text-center" style="display:none;" data-i18n="cart.empty">
+                Il carrello è vuoto.
+              </p>
+
+              <ul class="space-y-3" id="checkoutCartItems">
+                <!-- Injected via JavaScript -->
+              </ul>
+            </div>
+
+            <div id="checkoutSubtotalContainer" class="mt-4 pt-4 border-t border-border flex justify-between items-center">
+              <span class="text-muted-foreground" data-i18n="cart.subtotal">Totale</span>
+              <span class="font-display text-2xl font-bold text-primary" id="checkoutSubtotal">€ 0.00</span>
+            </div>
+          </div>
+
+          <!-- Right Column: Checkout Form (lg:col-span-3) -->
+          <div class="lg:col-span-3 rounded-3xl bg-card border border-border p-5 sm:p-6 shadow-sm">
+            <div class="grid gap-4">
+              <!-- Name & Phone Fields -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="orderName" class="text-sm font-semibold mb-1.5 block" data-i18n="checkout.name">Nome e cognome</label>
+                  <input type="text" id="orderName" class="w-full min-h-[48px] rounded-xl border border-input bg-background px-4 text-base outline-none focus:ring-2 ring-primary" placeholder="Es. Mario Rossi" data-i18n-ph="checkout.namePh">
+                </div>
+                <div>
+                  <label for="orderPhone" class="text-sm font-semibold mb-1.5 block" data-i18n="checkout.phone">Numero di telefono</label>
+                  <input type="tel" id="orderPhone" inputmode="tel" class="w-full min-h-[48px] rounded-xl border border-input bg-background px-4 text-base outline-none focus:ring-2 ring-primary" placeholder="Es. 333 1234567" data-i18n-ph="checkout.phonePh">
+                </div>
+              </div>
+
+              <!-- Order Type Selector -->
+              <div>
+                <label class="text-sm font-semibold mb-1.5 block" data-i18n="checkout.type">Tipo di ordine</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button type="button" id="btnTypeDelivery" class="min-h-[52px] rounded-xl border-2 font-semibold text-sm transition-colors border-primary bg-primary/10 text-primary flex items-center justify-center gap-1.5">
+                    <span>🚚</span> <span data-i18n="checkout.delivery">Consegna</span>
+                  </button>
+                  <button type="button" id="btnTypePickup" class="min-h-[52px] rounded-xl border-2 font-semibold text-sm transition-colors border-border text-foreground/70 flex items-center justify-center gap-1.5">
+                    <span>🏪</span> <span data-i18n="checkout.pickup">Ritiro in pizzeria</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Delivery Specific Fields (Address, Map Picker, Notes) -->
+              <div id="deliveryFieldsGroup" class="grid gap-3">
+                <div>
+                  <label for="orderAddress" class="text-sm font-semibold mb-1.5 block" data-i18n="checkout.address">Indirizzo di consegna</label>
+                  <input type="text" id="orderAddress" class="w-full min-h-[48px] rounded-xl border border-input bg-background px-4 text-base outline-none focus:ring-2 ring-primary" placeholder="Inserisci il tuo indirizzo" data-i18n-ph="delivery.addressPlaceholder">
+                </div>
+
+                <!-- Interactive Location Picker in Checkout -->
+                <div class="rounded-2xl border border-border overflow-hidden z-0 isolate">
+                  <div class="h-[260px]">
+                    <div id="checkoutMap" class="w-full h-full"></div>
+                  </div>
+                  <div class="p-3 flex flex-wrap items-center gap-2 bg-card">
+                    <button type="button" id="btnCheckoutUseLocation" class="inline-flex items-center gap-2 min-h-[44px] px-4 rounded-full bg-secondary text-secondary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                      <span data-i18n="checkout.useLocation">Usa la mia posizione</span>
+                    </button>
+                    <span class="text-xs text-muted-foreground" data-i18n="checkout.setOnMap">Trascina il segnaposto sulla mappa</span>
+                    <span id="checkoutMapStatus" class="text-xs font-semibold" style="display:none;"></span>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="orderNotes" class="text-sm font-semibold mb-1.5 block" data-i18n="checkout.notes">Note di consegna</label>
+                  <textarea id="orderNotes" rows="2" class="w-full rounded-xl border border-input bg-background px-4 py-3 text-base outline-none focus:ring-2 ring-primary resize-none" placeholder="Interno, piano, citofono, stanza hotel..." data-i18n-ph="checkout.notesPh"></textarea>
+                </div>
+              </div>
+
+              <!-- Form Validation Message -->
+              <p id="checkoutErrorMsg" class="text-sm text-primary font-medium" style="display:none;"></p>
+
+              <!-- WhatsApp Order Submit Button -->
+              <button type="button" id="btnSubmitWhatsApp" class="w-full min-h-[56px] rounded-full bg-[#25D366] text-white font-bold text-base flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 active:scale-[0.99] transition-transform">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                <span data-i18n="checkout.sendWhats">Invia ordine su WhatsApp</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Contact & Opening Hours (Exact 1:1 pz Component) -->
+    <section id="contact" class="section-pad py-16 sm:py-24">
+      <div class="container-x">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <span class="text-sm font-semibold uppercase tracking-widest text-primary" data-i18n="contact.title">Contatti</span>
+          <h2 class="mt-2 font-display text-4xl sm:text-5xl font-bold" data-i18n="contact.title">Contatti</h2>
+          <p class="mt-3 text-muted-foreground" data-i18n="contact.subtitle">Vieni a trovarci o ordinaci la tua pizza</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+          <!-- Left Column: Contact Details & Schedule -->
+          <div class="rounded-3xl bg-card border border-border p-6 sm:p-8 shadow-sm flex flex-col gap-5">
+            <!-- Address Row -->
+            <div class="flex items-start gap-4">
+              <div class="h-11 w-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <p class="text-sm text-muted-foreground" data-i18n="contact.address">Indirizzo</p>
+                <p class="font-semibold" id="contactAddressText">Via della Repubblica 118b, 25039 Sarezzo (BS), Italia</p>
+              </div>
+            </div>
+
+            <!-- Phone Row -->
+            <div class="flex items-start gap-4">
+              <div class="h-11 w-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm text-muted-foreground" data-i18n="contact.phone">Telefono</p>
+                <a href="tel:+39030803081" class="font-semibold hover:text-primary transition-colors">030 803081</a>
+              </div>
+            </div>
+
+            <!-- WhatsApp Row -->
+            <div class="flex items-start gap-4">
+              <div class="h-11 w-11 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm text-muted-foreground" data-i18n="contact.whatsapp">WhatsApp</p>
+                <p class="font-semibold">+39 324 818 4746</p>
+              </div>
+            </div>
+
+            <!-- Hours Row -->
+            <div class="flex items-start gap-4">
+              <div class="h-11 w-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm text-muted-foreground mb-1" data-i18n="contact.hours">Orari di apertura</p>
+                <ul class="text-sm divide-y divide-border" id="contactHoursList">
+                  <!-- Injected via JavaScript with red highlights on closed days -->
+                </ul>
+              </div>
+            </div>
+
+            <!-- Action Buttons in Left Card -->
+            <div class="flex flex-wrap gap-3 mt-2">
+              <a href="tel:+39030803081" class="inline-flex items-center gap-2 min-h-[52px] px-5 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span data-i18n="contact.callNow">Chiama ora</span>
+              </a>
+              <a href="https://wa.me/393248184746?text=Ciao%2C%20vorrei%20ordinare%20una%20pizza." target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 min-h-[52px] px-5 rounded-full bg-[#25D366] text-white font-semibold text-sm hover:opacity-90 transition-opacity" id="contactWhatsAppBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                <span data-i18n="contact.whatsappUs">Scrivici su WhatsApp</span>
+              </a>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=Via+della+Repubblica+118b+25039+Sarezzo+BS+Italia" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 min-h-[52px] px-5 rounded-full bg-foreground text-background font-semibold text-sm hover:opacity-90 transition-opacity" id="contactDirectionsBtnLeft">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                <span data-i18n="contact.directions">Come arrivare</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Column: Interactive Map Card + Full Width Directions Button -->
+          <div class="rounded-3xl bg-card border border-border p-3 sm:p-4 shadow-sm flex flex-col">
+            <div class="flex-1 min-h-[320px] rounded-2xl overflow-hidden z-0 isolate">
+              <div id="pizzeriaLocationMap" class="w-full h-full min-h-[320px]"></div>
+            </div>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=Via+della+Repubblica+118b+25039+Sarezzo+BS+Italia" target="_blank" rel="noreferrer" class="mt-3 inline-flex items-center justify-center gap-2 min-h-[52px] w-full rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition-opacity" id="contactDirectionsBtnRight">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              <span data-i18n="contact.directions">Come arrivare</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer (White bg in Light Mode, Dark bg in Dark Mode) -->
+  <footer class="bg-card border-t border-border text-foreground section-pad pt-14 pb-24 sm:pb-10 transition-colors duration-300">
+    <div class="container-x">
+      <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Col 1: Brand, Tagline, Socials -->
+        <div>
+          <div class="flex items-center gap-3">
+            <img src="assets/images/logo.jpg" alt="Miss Biss" class="h-14 w-14 rounded-full object-cover ring-2 ring-primary/40">
+            <div>
+              <p class="font-display text-2xl font-bold text-foreground">Miss Biss</p>
+              <p class="text-xs uppercase tracking-widest text-muted-foreground">Pizzeria · dal 1971</p>
+            </div>
+          </div>
+          <p class="mt-4 text-sm text-muted-foreground max-w-xs" data-i18n="footer.tagline">Pizzeria dal 1971 · Sarezzo (Lombardia)</p>
+          <div class="mt-4 flex gap-3">
+            <a href="https://www.facebook.com/pizzeriamissbiss/?locale=it_IT" target="_blank" rel="noreferrer" class="h-10 w-10 rounded-full border border-border bg-muted/40 hover:bg-primary hover:text-primary-foreground hover:border-primary text-foreground flex items-center justify-center transition-colors" aria-label="Facebook">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+            <a href="https://www.instagram.com/missbiss__pizzeria/" target="_blank" rel="noreferrer" class="h-10 w-10 rounded-full border border-border bg-muted/40 hover:bg-primary hover:text-primary-foreground hover:border-primary text-foreground flex items-center justify-center transition-colors" aria-label="Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Col 2: Navigation Links -->
+        <div>
+          <p class="font-semibold text-foreground mb-3" data-i18n="nav.home">Home</p>
+          <ul class="space-y-2 text-sm text-muted-foreground">
+            <li><button type="button" onclick="document.getElementById('home')?.scrollIntoView({behavior:'smooth'})" class="hover:text-primary transition-colors" data-i18n="nav.home">Home</button></li>
+            <li><button type="button" onclick="document.getElementById('menu')?.scrollIntoView({behavior:'smooth'})" class="hover:text-primary transition-colors" data-i18n="nav.menu">Menu</button></li>
+            <li><button type="button" onclick="document.getElementById('delivery')?.scrollIntoView({behavior:'smooth'})" class="hover:text-primary transition-colors" data-i18n="nav.delivery">Delivery</button></li>
+            <li><button type="button" onclick="document.getElementById('about')?.scrollIntoView({behavior:'smooth'})" class="hover:text-primary transition-colors" data-i18n="nav.about">Chi siamo</button></li>
+            <li><button type="button" onclick="document.getElementById('contact')?.scrollIntoView({behavior:'smooth'})" class="hover:text-primary transition-colors" data-i18n="nav.contact">Contatti</button></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Contacts Details -->
+        <div>
+          <p class="font-semibold text-foreground mb-3" data-i18n="contact.title">Contatti</p>
+          <ul class="space-y-3 text-sm text-muted-foreground">
+            <li class="flex items-start gap-2">
+              <svg width="16" height="16" class="mt-0.5 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Via della Repubblica 118b, Sarezzo</span>
+            </li>
+            <li>
+              <a href="tel:+39030803081" class="flex items-center gap-2 hover:text-primary transition-colors">
+                <svg width="16" height="16" class="text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span>030 803081</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://wa.me/393248184746?text=Ciao%2C%20vorrei%20ordinare%20una%20pizza." target="_blank" rel="noreferrer" class="flex items-center gap-2 hover:text-[#25D366] transition-colors" id="footerWhatsAppLink">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#25D366]"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                <span>+39 324 818 4746</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Opening Hours & Theme / Lang Switchers -->
+        <div>
+          <p class="font-semibold text-foreground mb-3" data-i18n="contact.hours">Orari di apertura</p>
+          <ul class="space-y-1 text-sm text-muted-foreground" id="footerHoursList">
+            <!-- Injected via JavaScript -->
+          </ul>
+          
+          <div class="mt-5 flex items-center gap-2">
+            <!-- Footer Lang Switcher -->
+            <div class="inline-flex items-center gap-0.5 rounded-full border border-border bg-muted/40 p-0.5 text-sm">
+              <button type="button" class="px-2.5 py-1 rounded-full font-semibold transition-colors bg-primary text-primary-foreground" id="btnFooterLangIt">IT</button>
+              <button type="button" class="px-2.5 py-1 rounded-full font-semibold transition-colors text-muted-foreground hover:text-foreground" id="btnFooterLangEn">EN</button>
+            </div>
+
+            <!-- Footer Theme Toggle -->
+            <button type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted/40 text-foreground transition-transform active:scale-90" id="btnFooterThemeToggle" aria-label="Toggle theme">
+              <svg id="themeFooterIconSun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+              <svg id="themeFooterIconMoon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom Sub-bar -->
+      <div class="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+        <p>© <span id="currentYear"></span> Miss Biss Pizzeria. <span data-i18n="footer.rights">Tutti i diritti riservati.</span></p>
+        <p class="flex items-center gap-1">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Sarezzo · Lombardia · Italia</span>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Slide-Over Cart Drawer -->
+  <div id="cartDrawerOverlay"></div>
+  <aside id="cartDrawer" aria-label="Shopping Cart">
+    <div class="flex items-center justify-between px-5 h-16 border-b border-border">
+      <div class="flex items-center gap-2">
+        <svg width="20" height="20" class="text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+        <h2 class="font-display text-xl font-bold" data-i18n="cart.title">Il tuo carrello</h2>
+      </div>
+      <button type="button" class="h-9 w-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors" id="btnCloseCart" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-5 py-4" id="cartDrawerBody">
+      <!-- Empty State -->
+      <div class="h-full flex flex-col items-center justify-center text-center text-muted-foreground gap-3" id="cartDrawerEmpty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="opacity-30"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+        <p data-i18n="cart.empty">Il carrello è vuoto.</p>
+      </div>
+
+      <!-- Item List -->
+      <ul class="space-y-3" id="cartDrawerItems">
+        <!-- Injected via JavaScript -->
+      </ul>
+    </div>
+
+    <div class="border-t border-border px-5 py-4 space-y-3 bg-card" id="cartDrawerFooter" style="display:none;">
+      <div class="flex items-center justify-between">
+        <button type="button" class="text-sm text-muted-foreground hover:text-primary transition-colors" id="btnClearCart" data-i18n="cart.clear">Svuota</button>
+        <div class="text-right">
+          <p class="text-sm text-muted-foreground" data-i18n="cart.subtotal">Totale</p>
+          <p class="font-display text-2xl font-bold text-primary" id="cartDrawerSubtotal">€ 0.00</p>
+        </div>
+      </div>
+      <button type="button" class="w-full min-h-[52px] rounded-full bg-primary text-primary-foreground font-semibold text-base hover:opacity-90 transition-opacity" id="btnDrawerCheckout" data-i18n="cart.checkout">Vai all'ordine</button>
+    </div>
+  </aside>
+
+  <!-- Mobile Floating Bottom Bar -->
+  <div class="sm:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-border px-3 py-2 flex items-center justify-around">
+    <a href="tel:+39030803081" class="flex flex-col items-center justify-center w-16 py-1.5 rounded-xl active:scale-95 transition-transform">
+      <svg width="20" height="20" class="text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span class="text-[11px] font-medium mt-0.5" data-i18n="hero.call">Chiama</span>
+    </a>
+    <a href="https://wa.me/393248184746?text=Ciao%2C%20vorrei%20ordinare%20una%20pizza." target="_blank" rel="noreferrer" class="flex flex-col items-center justify-center w-16 py-1.5 rounded-xl active:scale-95 transition-transform" id="mobileBottomWhatsApp">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+      <span class="text-[11px] font-medium mt-0.5">WhatsApp</span>
+    </a>
+    <button type="button" class="relative flex flex-col items-center justify-center w-16 py-1.5 rounded-xl active:scale-95 transition-transform" id="btnMobileCart">
+      <div class="relative">
+        <svg width="20" height="20" class="text-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+        <span class="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[9px] font-bold hidden items-center justify-center" id="mobileCartBadge">0</span>
+      </div>
+      <span class="text-[11px] font-medium mt-0.5" data-i18n="nav.order">Ordina</span>
+    </button>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Application Logic -->
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
